@@ -1,0 +1,16 @@
+# containers/Dockerfile.gcta
+FROM mambaorg/micromamba:1.5.8
+
+# Make micromamba's "Dockerfile activate" behavior available
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+
+# Create a new env named "gcta" and install a pinned GCTA
+RUN micromamba create -y -n gcta -c conda-forge -c bioconda gcta=1.94.1 && \
+    micromamba clean -a -y
+
+# Use bash for subsequent RUN commands and ensure the env is on PATH
+SHELL ["/bin/bash", "-lc"]
+ENV PATH=/opt/conda/envs/gcta/bin:$PATH
+
+# Default to gcta64 when running the container
+ENTRYPOINT ["gcta64"]
