@@ -51,6 +51,28 @@ coverage.xml
 .pytest_cache/
 cover/
 
+#don't save data folder
+data/
+
+# --- Nextflow ---
+work/                  # temporary working directory
+.results/              # if you store outputs here
+.nextflow*             # runtime files, logs, configs, etc.
+.cache/                # cache files (rarely created manually)
+pipeline_info/         # generated reports, trace, timeline
+*.report.html
+*.timeline.html
+*.dag.png
+*.trace.txt
+*.log
+
+# --- Docker / Singularity / Conda ---
+conda/
+singularity/
+.nextflow_conda/
+.nextflow_singularity/
+.nextflow_docker/ 
+
 # Translations
 *.mo
 *.pot
