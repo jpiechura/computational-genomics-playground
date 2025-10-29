@@ -17,6 +17,8 @@ INVCF="$1"
 SAMPLES="$2"
 OUTVCF="$3"
 
+tmp="${OUTVCF%.vcf.gz}.tmp.vcf.gz"
+
 # Create output directory if it doesn't exist
 mkdir -p "$(dirname "$OUTVCF")"
 
@@ -26,10 +28,15 @@ mkdir -p "$(dirname "$OUTVCF")"
 # -Oz outputs a bgzipped VCF
 # -o specifies the output file
 # last argument is the input VCF, which is bgzipped. bcftools will look for the .tbi index file automatically
-bcftools view -S "$SAMPLES" -Oz -o "$OUTVCF" "$INVCF"
+bcftools view -S "$SAMPLES" -Oz -o "${tmp}" "$INVCF"
+
+#add unique ids to variants with missing ids
+bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' -Oz -o "$OUTVCF" "${tmp}"
 
 # Index the output VCF
 
 bcftools index --tbi "$OUTVCF"
+
+rm -f "${tmp}"
 
 echo "Subset VCF → $OUTVCF (and .tbi)"

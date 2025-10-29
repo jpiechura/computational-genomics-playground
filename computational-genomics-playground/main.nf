@@ -135,44 +135,35 @@ process GCTA_SIM {
     path "sim.*", emit: sim_outputs
 
   script:
+script:
 '''
 set -euo pipefail
 
-# Derive PLINK prefix (basename without .bed) from the staged BED path
 bed_file="''' + bed + '''"
 base="$(basename "$bed_file")"
 base="${base%.bed}"
 
-echo "Input files:"
-ls -lh
-
 echo "Running GCTA GRM..."
-gcta64 --bfile "$base" \
-       --make-grm \
-       --out sim \
-       --thread-num ''' + task.cpus + '''
+gcta64 --bfile "$base" --make-grm --out sim --thread-num ''' + task.cpus + '''
 
-# Count unique SNP IDs first (BIM col2)
+# Count unique SNP IDs
 nuniq=$(awk '!seen[$2]++{c++} END{print c+0}' "${base}.bim")
 if [ "$nuniq" -lt ''' + params.n_causal + ''' ]; then
   echo "Not enough unique SNP IDs in ${base}.bim: have $nuniq, need ''' + params.n_causal + '''" >&2
   exit 1
 fi
 
-# Build a unique, reproducibly shuffled causal list
-#  1) extract unique IDs (keep first occurrence)
-#  2) assign seeded random key
-#  3) sort by key (and by ID as a tiebreaker for determinism)
-#  4) take N
-awk '!seen[$2]++{print $2}' "${base}.bim" \
-  | awk -v seed=''' + params.seed + ''' 'BEGIN{srand(seed)} {printf "%0.12f\t%s\n", rand(), $0}' \
-  | sort -k1,1n -k2,2 \
-  | cut -f2 \
+# Build causal list
+set +o pipefail
+awk '!seen[$2]++{print $2}' "${base}.bim" \\
+  | awk -v seed=''' + params.seed + ''' 'BEGIN{srand(seed)} {printf "%0.12f\\t%s\\n", rand(), $0}' \\
+  | LC_ALL=C sort -k1,1n -k2,2 \\
+  | cut -f2 \\
   | head -n ''' + params.n_causal + ''' > causal.snplist
-
+set -o pipefail
 echo "Selected $(wc -l < causal.snplist) unique causal SNPs."
 
-echo "Simulating quantitative trait..."
+echo "Simulating phenotype..."
 gcta64 --bfile "$base" \
        --simu-qt \
        --grm sim \
