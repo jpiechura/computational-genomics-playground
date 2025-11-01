@@ -15,6 +15,8 @@ params.vcfdir    = "${launcher_path}/data/1kg/vcf"
 params.metadir   = "${launcher_path}/data/1kg/meta"
 params.plinkdir  = "${launcher_path}/data/1kg/plink"
 params.workdir   = "${launcher_path}/work"
+params.phendir   = "${launcher_path}/pheno"
+params.qcdir     = "${launcher_path}/qc"
 params.h2        = params.h2        ?: 0.5
 params.n_causal  = params.n_causal  ?: 50
 params.seed      = params.seed      ?: 142
@@ -24,6 +26,19 @@ new File(params.vcfdir).mkdirs()
 new File(params.metadir).mkdirs()
 new File(params.plinkdir).mkdirs()
 new File(params.workdir).mkdirs()
+new File(params.phendir).mkdirs()
+new File(params.qcdir).mkdirs()
+
+include { PLINKIFY } from './nf/modules/PLINKIFY.nf'
+include { GCTA_SIM } from './nf/modules/GCTA_SIM.nf'
+include { QC_PLINK } from './nf/modules/QC_PLINK.nf'
+include { QC_HET } from './nf/modules/QC_HET.nf'
+include { QC_HETDIF_FILT } from './nf/modules/QC_HETDIF_FILT.nf'
+include { MAKE_PY_ENV } from './nf/modules/MAKE_PY_ENV.nf'
+include { PCA_PLINK } from './nf/modules/PCA_PLINK.nf'
+include { BUILD_COVAR } from './nf/modules/BUILD_COVAR.nf'
+include { GWAS_PLINK } from './nf/modules/GWAS_PLINK.nf'
+
 
 workflow.onComplete {
   println "Done. Check ${params.vcfdir}, ${params.metadir}, ${params.plinkdir}, and ${params.workdir}."
@@ -98,81 +113,10 @@ process SUBSET_VCF {
   """
 }
 
-/* --------------- 4) Convert subset VCF → PLINK -------------- */
-process PLINKIFY {
-  tag "plink_chr${params.chr}_${params.pop}${params.n_samples}"
-  container 'quay.io/biocontainers/plink:1.90b6.21--hec16e2b_2'
 
-  input:
-    path vcf_file
-    path plinkify_script
 
-  publishDir "${params.plinkdir}", mode: 'copy', pattern: "chr${params.chr}.${params.pop}${params.n_samples}.*"
 
-  output:
-    path "chr${params.chr}.${params.pop}${params.n_samples}.*", emit: plink_files
 
-  script:
-  """
-  OUTP=\$PWD/chr${params.chr}.${params.pop}${params.n_samples}
-  bash "$plinkify_script" "$vcf_file" "\$OUTP"
-  """
-}
-
-/* --------- 5) Build GRM + simulate phenotype with GCTA ------- */
-process GCTA_SIM {
-  tag "gcta_sim_chr${params.chr}_${params.pop}${params.n_samples}"
-
-  input:
-    path bed
-    path bim
-    path fam
-    path 'dummy.sh'  // Dummy input to maintain compatibility
-
-  publishDir "${params.workdir}", mode: 'copy', pattern: "sim.*"
-
-  output:
-    path "sim.*", emit: sim_outputs
-
-  script:
-script:
-'''
-set -euo pipefail
-
-bed_file="''' + bed + '''"
-base="$(basename "$bed_file")"
-base="${base%.bed}"
-
-echo "Running GCTA GRM..."
-gcta64 --bfile "$base" --make-grm --out sim --thread-num ''' + task.cpus + '''
-
-# Count unique SNP IDs
-nuniq=$(awk '!seen[$2]++{c++} END{print c+0}' "${base}.bim")
-if [ "$nuniq" -lt ''' + params.n_causal + ''' ]; then
-  echo "Not enough unique SNP IDs in ${base}.bim: have $nuniq, need ''' + params.n_causal + '''" >&2
-  exit 1
-fi
-
-# Build causal list
-set +o pipefail
-awk '!seen[$2]++{print $2}' "${base}.bim" \\
-  | awk -v seed=''' + params.seed + ''' 'BEGIN{srand(seed)} {printf "%0.12f\\t%s\\n", rand(), $0}' \\
-  | LC_ALL=C sort -k1,1n -k2,2 \\
-  | cut -f2 \\
-  | head -n ''' + params.n_causal + ''' > causal.snplist
-set -o pipefail
-echo "Selected $(wc -l < causal.snplist) unique causal SNPs."
-
-echo "Simulating phenotype..."
-gcta64 --bfile "$base" \
-       --simu-qt \
-       --grm sim \
-       --simu-hsq ''' + params.h2 + ''' \
-       --simu-causal-loci causal.snplist \
-       --simu-seed ''' + params.seed + ''' \
-       --out sim
-'''
-}
 
 /* -------------------- Wiring (workflow) --------------------- */
 workflow {
@@ -201,25 +145,54 @@ workflow {
   )
 
   // Stage 5: Run GCTA simulation
-  plinked.plink_files
-  .collect()
-  .map { files ->
-    def base = "chr${params.chr}.${params.pop}${params.n_samples}"
-    def bed = files.find { it.name == "${base}.bed" }
-    def bim = files.find { it.name == "${base}.bim" }
-    def fam = files.find { it.name == "${base}.fam" }
-    if (!bed || !bim || !fam) {
-      error "Missing PLINK files. Found: BED=${bed}, BIM=${bim}, FAM=${fam}"
-    }
-    log.info "PLINK files found: BED=${bed}, BIM=${bim}, FAM=${fam}"
-    tuple bed, bim, fam
-  }
-  .set { gcta_inputs }
 
-  GCTA_SIM(
-    gcta_inputs.map { it[0] },
-    gcta_inputs.map { it[1] },
-    gcta_inputs.map { it[2] },
-    file('dummy.sh')
+  def gcta_results = GCTA_SIM(
+    plinked.bed,
+    plinked.bim,
+    plinked.fam,
+  )
+
+  def plink_qc = QC_PLINK(
+    plinked.bed,
+    plinked.bim,
+    plinked.fam,
+    gcta_results.pheno_file
+  )
+
+  def pyenv = MAKE_PY_ENV()
+
+  def qc_het = QC_HET(
+    plink_qc.het_stats,
+    pyenv
+  )
+
+  def qc_hetfilt = QC_HETDIF_FILT(
+    qc_het.het_outliers,
+    gcta_results.pheno_file,
+    plink_qc.bed,
+    plink_qc.bim,
+    plink_qc.fam
+  )
+
+  def pca_results = PCA_PLINK(
+    qc_hetfilt.bed,
+    qc_hetfilt.bim,
+    qc_hetfilt.fam
+  )
+
+Channel.fromPath('bin/append_sex.awk').set { append_sex_script }
+  covar_file = BUILD_COVAR(
+    pca_results.eigenvec,
+    fetched.panel,
+    append_sex_script
+  )
+
+
+  def gwas_results = GWAS_PLINK(
+    qc_hetfilt.bed,
+    qc_hetfilt.bim,
+    qc_hetfilt.fam,
+    gcta_results.pheno_file,
+    covar_file.covar_file
   )
 }

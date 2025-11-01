@@ -19,6 +19,6 @@ mkdir -p "$(dirname "$OUTPREFIX")"
 # .bed : binary genotype table
 # .bim : variant information
 # .fam : sample information
-plink --vcf "$VCF" --make-bed --new-id-max-allele-len 20 --double-id --set-missing-var-ids @:#:$1:$2 --out "$OUTPREFIX"
+plink --vcf "$VCF" --make-bed --out "$OUTPREFIX"
 
 echo "PLINK files → ${OUTPREFIX}.bed/.bim/.fam"
