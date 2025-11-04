@@ -5,7 +5,7 @@ process MAKE_PY_ENV {
   container 'python:3.11'
 
   output:
-    path 'pyenv'  // directory
+    path 'pyenv'  
 
   script:
   """

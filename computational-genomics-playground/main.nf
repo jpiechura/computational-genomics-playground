@@ -38,6 +38,9 @@ include { MAKE_PY_ENV } from './nf/modules/MAKE_PY_ENV.nf'
 include { PCA_PLINK } from './nf/modules/PCA_PLINK.nf'
 include { BUILD_COVAR } from './nf/modules/BUILD_COVAR.nf'
 include { GWAS_PLINK } from './nf/modules/GWAS_PLINK.nf'
+include { GWAS_SUM } from './nf/modules/GWAS_SUM.nf'
+include { PLOT_QQ_MANHATTAN } from './nf/modules/PLOT_QQ_MANHATTAN.nf'
+include { CLUMP_PLINK19 } from './nf/modules/CLUMP_PLINK19.nf'
 
 
 workflow.onComplete {
@@ -194,5 +197,21 @@ Channel.fromPath('bin/append_sex.awk').set { append_sex_script }
     qc_hetfilt.fam,
     gcta_results.pheno_file,
     covar_file.covar_file
+  )
+
+  def gwas_summary = GWAS_SUM(
+    gwas_results.plink_output,
+    pyenv
+  )
+
+  def gwas_plots = PLOT_QQ_MANHATTAN(
+    gwas_summary.gwas_tsv
+  )
+
+  def clumped = CLUMP_PLINK19(
+    qc_hetfilt.bed,
+    qc_hetfilt.bim,
+    qc_hetfilt.fam,
+    gwas_summary.gwas_tsv
   )
 }
