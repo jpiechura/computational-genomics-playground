@@ -1,0 +1,7 @@
+# Uses precompiled CRAN binaries via r2u
+FROM rocker/r2u:22.04  
+
+# Install R packages as Debian binaries (near-instant)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      r-cran-data.table r-cran-matrix r-cran-susier \
+  && rm -rf /var/lib/apt/lists/*

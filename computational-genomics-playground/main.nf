@@ -41,6 +41,12 @@ include { GWAS_PLINK } from './nf/modules/GWAS_PLINK.nf'
 include { GWAS_SUM } from './nf/modules/GWAS_SUM.nf'
 include { PLOT_QQ_MANHATTAN } from './nf/modules/PLOT_QQ_MANHATTAN.nf'
 include { CLUMP_PLINK19 } from './nf/modules/CLUMP_PLINK19.nf'
+include { CLUMPS_TO_REGIONS } from './nf/modules/CLUMPS_TO_REGIONS.nf'
+include { EXTRACT_LOCSTATS } from './nf/modules/EXTRACT_LOCSTATS.nf'
+include { MAKE_REGION_BFILE } from './nf/modules/MAKE_REGION_BFILE.nf'
+include { COMPUTE_LD } from './nf/modules/COMPUTE_LD.nf'
+include { PREP_ZSCORES } from './nf/modules/PREP_ZSCORES.nf'
+include { RUN_SUSIE_RSS } from './nf/modules/RUN_SUSIE_RSS.nf'
 
 
 workflow.onComplete {
@@ -214,4 +220,71 @@ Channel.fromPath('bin/append_sex.awk').set { append_sex_script }
     qc_hetfilt.fam,
     gwas_summary.gwas_tsv
   )
+
+    def regions = CLUMPS_TO_REGIONS(
+        clumped.lead_snps
+    )
+
+    Channel
+        regions.loci
+        .splitCsv(header:true, sep:'\t')
+        .map { row ->
+            if (row.containsKey('start') && row.containsKey('end')) {
+                tuple(row.locus_id, row.chr as String, row.start as long, row.end as long)
+            } else {
+                // lead-SNP row: compute window
+                def half = (params.window_kb as long) * 1000L
+                tuple(row.locus_id, row.chr as String, (row.bp as long) - half, (row.bp as long) + half)
+            }
+        }
+        .set { loci_ch }
+
+    // 1) subset GWAS to region
+    def locstats = EXTRACT_LOCSTATS(loci_ch, gwas_summary.gwas_tsv)
+
+    def region_bfiles = MAKE_REGION_BFILE(
+        locstats,
+        qc_hetfilt.bed,
+        qc_hetfilt.bim,
+        qc_hetfilt.fam
+    )
+
+    def ld_matrices = COMPUTE_LD(
+        region_bfiles
+    )
+    //make z prep inputs
+    // you want val(locus_id), path(zfile), path(prune_in), path(pruned_bim)
+    //ld matrices has  tuple val(locus_id),path("ld.${locus_id}.ld"),path("ld.${locus_id}.snplist"),path("region_${locus_id}.pruned.bim"),
+    //pruning happens in make_region_bfile
+    // Extract (id, sumstats)
+
+    sumstats_ch = locstats.map { id, chr, start, end, sfile -> tuple(id, sfile) }
+
+// (id, prune_in, pruned_bim)
+pruned_index_ch = region_bfiles.map { id, bed, pbim, pfam, prune_in ->
+  tuple(id, prune_in, pbim)
+}
+
+// Join on id → (id, zfile, prune_in, pruned_bim)
+prep_inputs = sumstats_ch
+  .join(pruned_index_ch)
+  .map { id, zfile, prune_in, pruned_bim -> tuple(id, zfile, prune_in, pruned_bim) }
+
+
+
+    def z_scores = PREP_ZSCORES(
+        prep_inputs
+    )
+    
+
+  susie_inputs = z_scores
+  .map { id, zfile      -> tuple(id, zfile) }   // keep key
+  .join(  ld_matrices .map { id, rfile  -> tuple(id, rfile) } )
+  .join(  region_bfiles .map { id, x, y, z, keepfile-> tuple(id, keepfile) } )
+
+
+    def susie = RUN_SUSIE_RSS(
+        susie_inputs
+    )
+        
 }
