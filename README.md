@@ -106,15 +106,16 @@ nextflow run . -profile docker \
 | `--pop`  | `EUR`              | 1000 genomes population designation for data to subset                         |
 | `--n_samples` | `500`  | Number of samples to randomly subset from the designated population                        |
 
-### Outputs (planned structure, need to update)
+### Repo contents 
 
 ```
 .
-├─ containers/
-├─ modules/
-├─ workflows/
-├─ bin/
-├─ conf/
-├─ data/
+├─ computational-genomics-playground
+| ├─ containers/ #dockerfiles for required containers
+| ├─ nf / 
+| | ├─ modules #nextflow modules for steps
+| ├─ bin/ #bash, awk, python, and R helper scripts
+| ├─ conf/
+| ├─ data/
 └─ README.md
 ```
