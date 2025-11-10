@@ -20,11 +20,8 @@ The pipeline assumes **system prerequisites** (Java, Nextflow, a container runti
 ## Pipeline diagrame
 ```mermaid
 flowchart LR
-A[Input genotype / summary stats] --> B[QC & Filtering];
-B --> C[Covariates / PCA];
-C --> D[Association test / GWAS];
-D --> E[Fine-mapping (SuSiE-RSS)];
-E --> F[Reports & Plots];
+A --> B;
+B --> C;
 
 
 ## Prerequisites
