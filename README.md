@@ -107,14 +107,14 @@ nextflow run . -profile docker \
 | `--n_samples` | `500`  | Number of samples to randomly subset from the designated population                        |
 
 ### Repo contents 
+
 ```
 .
-├─ computational-genomics-playground/
-│  ├─ containers/        # Dockerfiles for required containers
-│  ├─ nf/                # Nextflow workflows and modules
-│  │  ├─ modules/        # Nextflow modules for pipeline steps
-│  ├─ bin/               # Bash, Awk, Python, and R helper scripts
-│  ├─ conf/              # Nextflow configs (executor, profiles)
-│  ├─ data/              # Demo or test datasets
-│  └─ README.md
+├─ containers/
+├─ modules/
+├─ workflows/
+├─ bin/
+├─ conf/
+├─ data/
+└─ README.md
 ```
