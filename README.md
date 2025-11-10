@@ -140,6 +140,7 @@ disequilibirum
 
 ### Example results
 ![Manhattan plot of simulated phenotype data for 500 random individuals from 1000 genomes european population](computational-genomics-playground/example_data/manhattan.png)
+Manhattan plot of simulated phenotype data for 500 random individuals from 1000 genomes European population.
 
 ### Repository tour 
 
@@ -156,3 +157,10 @@ disequilibirum
 └─ README.md
 
 ```
+
+### Roadmap
+- [X] Establish End to end pipeline
+- [ ] Polish output directory structure
+- [ ] Host required containers in a public repository
+- [ ] Add further plotting functionality
+- [ ] Generate an explanatory jupyter notebook
