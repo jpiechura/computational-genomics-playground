@@ -2,6 +2,8 @@
 
 This repo demonstrates a minimal, reproducible setup for GWAS-style workflows using **Nextflow** with **containerized tools**.  In short, the pipeline downloads a subset of the **1000 genomes** Human Genome dataset based on inputs and filters the data for various QC criteria. Currently, **GCTA** is used to simulate a quantitative signal for demonstrative purposes. **PLINK** is used to test for association of individual SNPs with the simulated quantitative phenotype and produce a list of linked regions of statistically significant SNPs that are associated with the phenotype. Finally, **SuSiE-RSS** is used to fine-map SNPs within each linked region of SNPs to determine whether multiple independent causal variants are present and to compute posterior inclusion probabilities and credible sets. I plan to end some further plotting functionality to improve exploration of results.
 
+The pipeline assumes **system prerequisites** (Java, Nextflow, a container runtime) and then runs everything inside containers for reproducibility.
+
 ## Why this repo?
 
 - **Reproducible by default:** all heavy lifting runs inside containers.
@@ -15,9 +17,7 @@ This repo demonstrates a minimal, reproducible setup for GWAS-style workflows us
 - **Language mix:** Nextflow + R + shell + a touch of Python for utilities
 - **Typical stages:** ingest → QC → covariates/PCA → association → fine-mapping (e.g., SuSiE-RSS)
 
-## Pipeline diagram
-
-
+## Pipeline diagrame
 ```mermaid
 flowchart LR
     A[Input genotype/summary stats] --> B[QC & Filtering]
@@ -25,8 +25,8 @@ flowchart LR
     C --> D[Association test (GWAS)]
     D --> E[Fine-mapping (e.g., SuSiE-RSS)]
     E --> F[Reports & Plots, planned]
+```
 
-It assumes **system prerequisites** (Java, Nextflow, a container runtime) and then runs everything inside containers for reproducibility.
 
 ## Prerequisites
 
@@ -67,6 +67,8 @@ brew install colima docker
 colima start --cpu 4 --memory 8 --disk 60
 docker run hello-world
 ```
+
+### Install a container runtime
 
 ### Quick start
 -Check prerequisites
