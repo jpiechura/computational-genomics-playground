@@ -1,6 +1,31 @@
 # GWAS Demo Pipeline (Nextflow + Docker)
 
-This repo demonstrates a minimal, reproducible setup for GWAS-style workflows using **Nextflow** with **containerized tools**.  
+This repo demonstrates a minimal, reproducible setup for GWAS-style workflows using **Nextflow** with **containerized tools**.  In short, the pipeline downloads a subset of the **1000 genomes** Human Genome dataset based on inputs and filters the data for various QC criteria. Currently, **GCTA** is used to simulate a quantitative signal for demonstrative purposes. **PLINK** is used to test for association of individual SNPs with the simulated quantitative phenotype and produce a list of linked regions of statistically significant SNPs that are associated with the phenotype. Finally, **SuSiE-RSS** is used to fine-map SNPs within each linked region of SNPs to determine whether multiple independent causal variants are present and to compute posterior inclusion probabilities and credible sets. I plan to end some further plotting functionality to improve exploration of results.
+
+## Why this repo?
+
+- **Reproducible by default:** all heavy lifting runs inside containers.
+- **Production-minded design:** clear inputs/outputs, automation-ready structure, and CI-ready layout.
+- **Pedagogical:** meant to be easy to clone, run, and extend.
+
+## At a glance
+
+- **Orchestrator:** Nextflow (≥ 24.x)
+- **Runtime:** Docker Desktop / Colima / Podman
+- **Language mix:** Nextflow + R + shell + a touch of Python for utilities
+- **Typical stages:** ingest → QC → covariates/PCA → association → fine-mapping (e.g., SuSiE-RSS)
+
+## Pipeline diagram
+
+
+```mermaid
+flowchart LR
+    A[Input genotype/summary stats] --> B[QC & Filtering]
+    B --> C[Covariates / PCA]
+    C --> D[Association test (GWAS)]
+    D --> E[Fine-mapping (e.g., SuSiE-RSS)]
+    E --> F[Reports & Plots, planned]
+
 It assumes **system prerequisites** (Java, Nextflow, a container runtime) and then runs everything inside containers for reproducibility.
 
 ## Prerequisites
