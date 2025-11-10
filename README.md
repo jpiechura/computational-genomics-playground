@@ -102,7 +102,24 @@ nextflow run . -profile docker \
 ### Inputs & parameters
 | Param          | Type/Example                           | Description                                |
 | -------------- | -------------------------------------- | ------------------------------------------ |
-| `--chr`  | '22'          | Chromosome to download 1000 genomes data for                      |
+| `--chr`  | `22`          | Chromosome to download 1000 genomes data for                      |
 | `--pop`  | `EUR`              | 1000 genomes population designation for data to subset                         |
 | `--n_samples` | `500`  | Number of samples to randomly subset from the designated population                        |
 
+### Outputs (planned structure, need to update)
+results/
+  outdir/
+    1000g/
+      <chr>_<pop>.vcf.gz #subset population
+    gwas/
+      chr1.assoc.tsv.gz
+      manhattan.png
+      qqplot.png
+    finemapping/
+      locus_1_100k_300k/
+        susie_fit.rds
+        credible_sets.tsv
+        pip.tsv
+    logs/
+      timeline.html
+      trace.txt
