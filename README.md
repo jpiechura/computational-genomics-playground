@@ -24,8 +24,7 @@ flowchart LR
     B --> C[Covariates / PCA]
     C --> D[Association test (GWAS)]
     D --> E[Fine-mapping (e.g., SuSiE-RSS)]
-    E --> F[Reports & Plots, planned]
-```
+    E --> F[Reports & Plots]
 
 
 ## Prerequisites
