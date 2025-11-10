@@ -110,7 +110,7 @@ nextflow run . -profile docker \
 | `--n_samples` | `500`  | Number of samples to randomly subset from the designated population                        |
 
 
-### Output structure (planned, needs to be updates)
+### Output structure (planned, needs to be updated)
 ```text
 .
 ├─ results/
