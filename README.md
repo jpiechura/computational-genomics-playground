@@ -30,6 +30,7 @@ The pipeline assumes **system prerequisites** (Java, Nextflow, a container runti
 - Verify:
   ```bash
   java -version
+  ```
 
 ### Install Nextflow
 ```bash
@@ -73,7 +74,7 @@ docker run hello-world
 ```
 
 ### Create required containers
-The repo uses publically available containers where possible for ease of use, but two containers must be built specifically for this pipeline. I plan to host them publicly in the future. For now, create these two containers with the below commands executed from the base directory of the repo:
+The repo uses publicly available containers where possible for ease of use, but two containers must be built specifically for this pipeline. I plan to host them publicly in the future. For now, create these two containers with the below commands executed from the base directory of the repo:
 
 ```bash
 DOCKER_BUILDKIT=1 docker buildx build \
@@ -121,7 +122,7 @@ nextflow run . -profile docker \
 │  │  ├─ qc/ 
 │  │  └─ <CHR>_<POP>.qcd.bed/bim/fam # plink files after harvey weinberg, missingness, minor allele frequency, heterozygosity, etc. 
 │  │  ├─ pca/ 
-│  │  └─ <CHR>_<POP>.pca.eigenvec # weights for top principal components for the qced dataset, to be used as covaraites
+│  │  └─ <CHR>_<POP>.pca.eigenvec # weights for top principal components for the qced dataset, to be used as covariates
 │  │  ├─ covar/ 
 │  │  └─ <CHR>_<POP>.pca.with_sex.covar # weight for top principal components, plus individual sexes, to be used as covariates for model fitting
 │  │  ├─ gwas/ 
@@ -131,11 +132,10 @@ nextflow run . -profile docker \
 │  │  ├─ clump/ 
 │  │  └─ lead_snps.tsv # top hit SNPs organized into clumps that cannot be distinguished due to linkage
 │  │  └─ loci.tsv # coordinates of loci containing clumps of lead snps, one locus per line
-disequilibirum
+disequilibrium
 │  │  ├─ finemap/ 
 │  │  └─ <LOCUS_ID>.susie_fit.rds # R data structure of susie results for locus
 │  │  └─ <LOCUS_ID>.credible_sets.tsv # list of credible sets from susie model fitting
-
 ```
 
 ### Example results
@@ -155,7 +155,6 @@ Manhattan plot of simulated phenotype data for 500 random individuals from 1000 
 │  ├─ bin/               # Bash, Awk, Python, and R helper scripts
 │  ├─ results/           # folder for saving results of runs
 └─ README.md
-
 ```
 
 ### Roadmap
