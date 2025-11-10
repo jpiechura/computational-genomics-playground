@@ -110,12 +110,12 @@ nextflow run . -profile docker \
 
 ```
 .
-├─ computational-genomics-playground
-| ├─ containers/ #dockerfiles for required containers
-| ├─ nf / 
-| | ├─ modules #nextflow modules for steps
-| ├─ bin/ #bash, awk, python, and R helper scripts
-| ├─ conf/
-| ├─ data/
-└─ README.md
+├─ computational-genomics-playground/
+│  ├─ containers/        # Dockerfiles for required containers
+│  ├─ nf/                # Nextflow workflows and modules
+│  │  ├─ modules/        # Nextflow modules for pipeline steps
+│  ├─ bin/               # Bash, Awk, Python, and R helper scripts
+│  ├─ conf/              # Nextflow configs (executor, profiles)
+│  ├─ data/              # Demo or test datasets
+│  └─ README.md
 ```
