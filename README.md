@@ -108,7 +108,7 @@ nextflow run . -profile docker \
 | `--n_samples` | `500`  | Number of samples to randomly subset from the designated population                        |
 
 ### Output structure (planned, needs to be updates)
-```
+```text
 .
 ├─ results/
 │  ├─ outdir/           # set results directory name
@@ -144,7 +144,7 @@ Manhattan plot of simulated phenotype data for 500 random individuals from 1000 
 
 ### Repository tour 
 
-```
+```text
 .
 ├─ computational-genomics-playground/
 │  └─main.nf             # main workflow
