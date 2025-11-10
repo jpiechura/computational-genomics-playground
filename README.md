@@ -97,7 +97,9 @@ DOCKER_BUILDKIT=1 docker buildx build \
 ### Minimal usage
 ```bash
 nextflow run . -profile docker \ 
-  --chr 22 --pop EUR --n_samples 500 \
+  --chr 22 \
+  --pop EUR \
+  --n_samples 500 
 ```
 
 ### Inputs & parameters
@@ -106,6 +108,7 @@ nextflow run . -profile docker \
 | `--chr`  | `22`          | Chromosome to download 1000 genomes data for                      |
 | `--pop`  | `EUR`              | 1000 genomes population designation for data to subset                         |
 | `--n_samples` | `500`  | Number of samples to randomly subset from the designated population                        |
+
 
 ### Output structure (planned, needs to be updates)
 ```text
