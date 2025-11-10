@@ -17,12 +17,6 @@ The pipeline assumes **system prerequisites** (Java, Nextflow, a container runti
 - **Language mix:** Nextflow + R + shell + a touch of Python for utilities
 - **Typical stages:** ingest → QC → covariates/PCA → association → fine-mapping (e.g., SuSiE-RSS)
 
-## Pipeline diagrame
-```mermaid
-flowchart LR
-A --> B;
-B --> C;
-
 
 ## Prerequisites
 
@@ -64,7 +58,11 @@ colima start --cpu 4 --memory 8 --disk 60
 docker run hello-world
 ```
 
-### Install a container runtime
+### Clone repo
+```bash
+git clone https://github.com/jpiechura/computational-genomics-playground.git
+cd computational-genomics-playground
+```
 
 ### Quick start
 -Check prerequisites
@@ -73,3 +71,38 @@ java -version
 nextflow -version
 docker run hello-world
 ```
+
+### Create required containers
+The repo uses publically available containers where possible for ease of use, but two containers must be built specifically for this pipeline. I plan to host them publicly in the future. For now, create these two containers with the below commands executed from the base directory of the repo:
+
+```bash
+DOCKER_BUILDKIT=1 docker buildx build \
+  --platform linux/amd64 \
+  -f containers/Dockerfile.gcta \
+  -t gcta:1.94.1 \
+  --load \
+  .
+```
+
+```bash
+DOCKER_BUILDKIT=1 docker buildx build \
+  --platform linux/amd64 \
+  -f containers/Dockerfile.susie \
+  -t susier:latest \
+  --load \
+  .
+```
+
+### Minimal usage
+```bash
+nextflow run . -profile docker \ 
+  --chr 22 --pop EUR --n_samples 500 \
+```
+
+### Inputs & parameters
+| Param          | Type/Example                           | Description                                |
+| -------------- | -------------------------------------- | ------------------------------------------ |
+| `--chr`  | '22'          | Chromosome to download 1000 genomes data for                      |
+| `--pop`  | `EUR`              | 1000 genomes population designation for data to subset                         |
+| `--n_samples` | `500`  | Number of samples to randomly subset from the designated population                        |
+
