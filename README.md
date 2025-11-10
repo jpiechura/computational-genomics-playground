@@ -108,7 +108,7 @@ nextflow run . -profile docker \
 
 ### Outputs (planned structure, need to update)
 
-
+```
 .
 ├─ containers/
 ├─ modules/
@@ -117,3 +117,4 @@ nextflow run . -profile docker \
 ├─ conf/
 ├─ data/
 └─ README.md
+```
