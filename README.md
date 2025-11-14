@@ -74,16 +74,7 @@ docker run hello-world
 ```
 
 ### Create required containers
-The repo uses publicly available containers where possible for ease of use, but two containers must be built specifically for this pipeline. I plan to host them publicly in the future. For now, create these two containers with the below commands executed from the base directory of the repo:
-
-```bash
-DOCKER_BUILDKIT=1 docker buildx build \
-  --platform linux/amd64 \
-  -f containers/Dockerfile.gcta \
-  -t gcta:1.94.1 \
-  --load \
-  .
-```
+The repo uses publicly available containers where possible for ease of use, but one container must be built specifically for this pipeline. I plan to host this publicly in the future. For now, create this containers with the below command executed from the base directory of the repo:
 
 ```bash
 DOCKER_BUILDKIT=1 docker buildx build \
