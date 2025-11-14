@@ -108,7 +108,7 @@ nextflow run . -profile docker \
 | `--chr`  | `22`          | Chromosome to download 1000 genomes data for                      |
 | `--pop`  | `EUR`              | 1000 genomes population designation for data to subset                         |
 | `--n_samples` | `500`  | Number of samples to randomly subset from the designated population                        |
-| `--runname` | `run1_chr22_eur`  | Results will be saved to /results/<runname>/                        |
+| `--runname` | `run1_chr22_eur`  | Results will be saved to /results/runname/                        |
 
 
 ### Output structure 
