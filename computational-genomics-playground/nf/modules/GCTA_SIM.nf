@@ -1,16 +1,14 @@
-
-
 nextflow.enable.dsl=2
 
 process GCTA_SIM {
   tag "gcta_sim_chr${params.chr}_${params.pop}${params.n_samples}"
-
+  label "gcta"
   input:
     path bed
     path bim
     path fam
 
-  publishDir "${params.phendir}", mode: 'copy', pattern: "sim.*"
+  publishDir "${params.run_outdir}/pheno", mode: 'copy', pattern: "sim.*"
 
   output:
     path "sim.phen", emit: pheno_file

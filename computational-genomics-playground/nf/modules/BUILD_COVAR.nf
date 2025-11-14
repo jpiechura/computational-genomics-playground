@@ -11,7 +11,7 @@ process BUILD_COVAR {
   output:
     path "*.covar",        emit: covar_file
 
-  publishDir "covar", mode: 'copy'
+  publishDir "${params.run_outdir}/covar", mode: 'copy'
 
   script:
 """

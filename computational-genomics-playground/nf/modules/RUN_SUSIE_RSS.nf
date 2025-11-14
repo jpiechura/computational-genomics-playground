@@ -1,8 +1,8 @@
 nextflow.enable.dsl=2
 process RUN_SUSIE_RSS {
   tag "susie_${locus_id}"
-  container 'susier:latest'
-  publishDir "finemap", mode: 'copy'
+  label 'susie'
+  publishDir "${params.run_outdir}/finemap/${locus_id}", mode: 'copy'
 
 input:
       tuple val(locus_id), path(zfile), path(rfile), path(keepfile)
@@ -19,6 +19,6 @@ output:
     echo "R:  $rfile"
     echo "K:  $keepfile"
     set -euo pipefail
-    susie_rss.R ${zfile} ${rfile} ${keepfile} ${locus_id} 5 ${params.n_samples}
+    susie_rss.R ${zfile} ${rfile} ${keepfile} ${locus_id} 10 ${params.n_samples}
     """
 }

@@ -108,13 +108,14 @@ nextflow run . -profile docker \
 | `--chr`  | `22`          | Chromosome to download 1000 genomes data for                      |
 | `--pop`  | `EUR`              | 1000 genomes population designation for data to subset                         |
 | `--n_samples` | `500`  | Number of samples to randomly subset from the designated population                        |
+| `--runname` | `run1_chr22_eur`  | Results will be saved to /results/<runname>/                        |
 
 
-### Output structure (planned, needs to be updated)
+### Output structure 
 ```text
 .
 ├─ results/
-│  ├─ outdir/           # set results directory name
+│  ├─ <runname>/           # set results directory name from runname
 │  │  ├─ 1000g/ 
 │  │  └─ <CHR>_<POP>.vcf.gz # variant data for subset population
 │  │  └─ <CHR>_<POP>.bed/bim/fam # plink files for chosen individuals
@@ -162,7 +163,7 @@ Manhattan plot of simulated phenotype data for 500 random individuals from 1000 
 
 ### Roadmap
 - [X] Establish End to end pipeline
-- [ ] Polish output directory structure
+- [X] Polish output directory structure
 - [ ] Host required containers in a public repository
 - [ ] Add further plotting functionality
 - [ ] Generate an explanatory jupyter notebook

@@ -1,8 +1,8 @@
 nextflow.enable.dsl=2
 process CLUMPS_TO_REGIONS {
   tag "clump2reg_chr${params.chr}_${params.pop}${params.n_samples}"
-  container "python:3.11"
-  publishDir "clump", mode: 'copy'
+  label "python311"
+  publishDir "${params.run_outdir}/clump", mode: 'copy'
   input:
     path lead_snps
   output:

@@ -2,8 +2,8 @@ nextflow.enable.dsl=2
 
 process QC_HETDIF_FILT {
     tag "qc_het_${bed.baseName}"
-    publishDir "qc", mode: 'copy'
-    container "${params.plink_container}"
+    publishDir "${params.run_outdir}/qc", mode: 'copy'
+    label "plink"
     
     input:
         path het_outliers   

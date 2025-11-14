@@ -1,8 +1,8 @@
 nextflow.enable.dsl=2
 process PLOT_QQ_MANHATTAN {
   tag "gwas_plot_chr${params.chr}_${params.pop}${params.n_samples}"
-  container "python:3.11"
-  publishDir "gwas", mode: 'copy'
+  label "python311" 
+  publishDir "${params.run_outdir}/gwas", mode: 'copy'
   input:
     path gwas_tsv
 

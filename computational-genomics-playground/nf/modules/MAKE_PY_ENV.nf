@@ -1,7 +1,7 @@
 nextflow.enable.dsl=2
 
 process MAKE_PY_ENV {   
-  publishDir "${params.workdir}/pyenv", mode: 'copy'
+  publishDir "${params.run_outdir}/pyenv", mode: 'copy'
   container 'python:3.11'
 
   output:

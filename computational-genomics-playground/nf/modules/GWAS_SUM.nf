@@ -2,11 +2,10 @@ nextflow.enable.dsl=2
 
 process GWAS_SUM {
 tag "gwas_sum_chr${params.chr}_${params.pop}${params.n_samples}"
-publishDir "gwas", mode: 'copy'
-container "python:3.11"
+publishDir "${params.run_outdir}/gwas", mode: 'copy'
+label "python311"
 input:
     path plink_output
-    path pyenv
 
 
 output:
@@ -20,7 +19,8 @@ def prefix = "chr${params.chr}.${params.pop}${params.n_samples}"
 # Convert PLINK1.9 outputs to a unified TSV:
   #  - For logistic: p19_chr*.assoc.logistic
   #  - For linear:   p19_chr*.assoc.linear
-  ./pyenv/bin/python - <<'PY'
+  python3 -m pip install --no-cache-dir -q pandas numpy 
+  python3 - <<'PY'
 import glob, pandas as pd, numpy as np
 
 trait = "${params.trait_type}"

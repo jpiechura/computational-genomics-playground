@@ -2,8 +2,8 @@ nextflow.enable.dsl=2
 
 process PCA_PLINK {
   tag "${bed.baseName}"
-  publishDir "pca", mode: 'copy'
-  container "${params.plink_container}"
+  publishDir "${params.run_outdir}/pca", mode: 'copy'
+  label "plink"
 
   input:
     path bed

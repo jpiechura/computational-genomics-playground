@@ -1,8 +1,8 @@
 nextflow.enable.dsl=2
 
 process GWAS_PLINK {
-  tag "gcta_sim_chr${params.chr}_${params.pop}${params.n_samples}"
-  container 'quay.io/biocontainers/plink:1.90b6.21--hec16e2b_2'
+  tag "gwas_chr${params.chr}_${params.pop}${params.n_samples}"
+  label "plink"
   input:
     path bed
     path bim
@@ -10,7 +10,7 @@ process GWAS_PLINK {
     path pheno_file
     path covar_file
   
-  publishDir "gwas", mode: 'copy'
+  publishDir "${params.run_outdir}/gwas", mode: 'copy'
 
   output:
     path "*.assoc.*", emit: plink_output

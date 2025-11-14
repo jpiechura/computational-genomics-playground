@@ -2,8 +2,8 @@ nextflow.enable.dsl=2
 
 process EXTRACT_LOCSTATS {
   tag "extract_${locus_id}"
-  container 'quay.io/biocontainers/htslib:1.19--h81da01d_0'
-  publishDir "finemap", mode: 'copy'
+  label "htslib" 
+  publishDir "${params.run_outdir}/finemap/${locus_id}", mode: 'copy'
   input:
     input:
       tuple val(locus_id), val(chr), val(start), val(end)

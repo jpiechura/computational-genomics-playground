@@ -1,7 +1,7 @@
 process PREP_ZSCORES {
   tag "prepz_${locus_id}"
-  container 'quay.io/biocontainers/htslib:1.19--h81da01d_0'
-  publishDir "finemap/${locus_id}", mode: 'copy', overwrite: true
+  label "htslib"
+  publishDir "${params.run_outdir}/finemap/${locus_id}", mode: 'copy', overwrite: true
 
   input:
     tuple val(locus_id), path(zfile), path(prune_in), path(pruned_bim)

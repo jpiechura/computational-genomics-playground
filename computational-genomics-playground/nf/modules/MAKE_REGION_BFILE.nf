@@ -1,7 +1,7 @@
 process MAKE_REGION_BFILE {
   tag "makebfile_${locus_id}"
-  container 'quay.io/biocontainers/plink:1.90b6.21--hec16e2b_2'
-  publishDir "finemap/", mode: 'copy', overwrite: true
+  label "plink"
+  publishDir "${params.run_outdir}/finemap/${locus_id}", mode: 'copy', overwrite: true
 
   input:
     tuple val(locus_id), val(chr), val(start), val(end), path(sumstats)

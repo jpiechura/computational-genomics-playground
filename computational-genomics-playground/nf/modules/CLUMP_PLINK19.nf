@@ -1,8 +1,8 @@
 nextflow.enable.dsl=2
 process CLUMP_PLINK19 {
   tag "clump_chr${params.chr}_${params.pop}${params.n_samples}"
-  container 'quay.io/biocontainers/plink:1.90b6.21--hec16e2b_2'
-  publishDir "clump", mode: 'copy'
+  label "plink"
+  publishDir "${params.run_outdir}/clump", mode: 'copy'
   input:
     path bed
     path bim

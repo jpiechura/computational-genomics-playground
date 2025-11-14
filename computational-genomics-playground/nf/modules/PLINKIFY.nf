@@ -3,13 +3,13 @@ nextflow.enable.dsl=2
 
 process PLINKIFY {
   tag "plink_chr${params.chr}_${params.pop}${params.n_samples}"
-  container 'quay.io/biocontainers/plink:1.90b6.21--hec16e2b_2'
+  label "plink"
 
   input:
     path vcf_file
     path plinkify_script
 
-  publishDir "${params.plinkdir}", mode: 'copy', pattern: "chr${params.chr}.${params.pop}${params.n_samples}.*"
+  publishDir "${params.run_outdir}/1000g", mode: 'copy', pattern: "chr${params.chr}.${params.pop}${params.n_samples}.*"
 
   output:
     path "chr${params.chr}.${params.pop}${params.n_samples}.bim", emit: bim
